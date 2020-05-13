@@ -6,12 +6,8 @@ from city import City
 
 def run_file(file_name,plt):
 	cities = City.load_cities(file_name)
-	cost_matrix = City.cost_matrix(cities)
-
-	aco = ACO(10, 100, 1.0, 10.0, 0.5, 10)
-	graph = Graph(cost_matrix, len(cities))
-	path, cost = aco.solve(graph)
-
+	graph = Graph(cities)
+	path,cost = ACO(20, 100, 1.0, 2.0, 0.6, 10).solve(graph)
 	plt.plot(cities,path)
 	print(cost,path,cities)
 

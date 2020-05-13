@@ -1,12 +1,25 @@
 import random
+import math
 
 class Graph(object):
-	def __init__(self, cost_matrix: list, size: int):
-		self.cost = cost_matrix
-		self.size = size
-		self.pheromone = [[1 / (size * size) for j in range(size)] for i in range(size)]
+	def __init__(self, cities: list):
+		self.cities = cities
+		self.cost = Graph.cost_matrix(cities)
+		self.size = len(self.cities)
+		self.pheromone = [[1 for j in range(self.size)] for i in range(self.size)]
 
+	def distance(a, b):
+		return math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2)
 
+	def cost_matrix(cities):
+		cost_matrix = []
+		rank = len(cities)
+		for i in range(rank):
+			row = []
+			for j in range(rank):
+				row.append(Graph.distance(cities[i], cities[j]))
+			cost_matrix.append(row)
+		return cost_matrix
 
 class ACO(object):
 	def __init__(self, ant_count: int, generations: int, alpha: float, beta: float, rho: float, q: int):
@@ -37,7 +50,6 @@ class ACO(object):
 					best_cost = cost
 					best_solution = [] + ant.path
 			self._update_pheromone(graph, ants)
-			# print('generation #{}, best cost: {}, path: {}'.format(gen, best_cost, best_solution))
 		return best_solution, best_cost
 
 
@@ -49,10 +61,10 @@ class _Ant(object):
 
 		self.pheromone_delta = []  # the local increase of pheromone
 		self.allowed = {i for i in range(graph.size)}  # nodes which are allowed for the next selection
-		self.eta = [[0 if i == j else 1 / graph.cost[i][j] for j in range(graph.size)] for i in range(graph.size)]  # heuristic information
+		self.ease = [[0 if i == j else 1 / graph.cost[i][j] for j in range(graph.size)] for i in range(graph.size)]  # heuristic information
 
 		self.path = []  # path list
-		self.curr = random.randint(0, graph.size - 1)  # start from any node
+		self.curr = 0
 		self.path.append(self.curr)
 		self.allowed.remove(self.curr)
 
@@ -77,11 +89,11 @@ class _Ant(object):
 	def _select_next(self):
 		denominator = 0
 		for i in self.allowed:
-			denominator += self.graph.pheromone[self.curr][i]**self.aco.alpha * self.eta[self.curr][i]**self.aco.beta
+			denominator += self.graph.pheromone[self.curr][i]**self.aco.alpha * self.ease[self.curr][i]**self.aco.beta
 
 		probabilities = [0 for i in range(self.graph.size)]  # probabilities for moving to a node in the next step
 		for i in self.allowed:
-			probabilities[i] = self.graph.pheromone[self.curr][i]**self.aco.alpha * self.eta[self.curr][i]**self.aco.beta / denominator
+			probabilities[i] = self.graph.pheromone[self.curr][i]**self.aco.alpha * self.ease[self.curr][i]**self.aco.beta / denominator
 
 		self.curr = self._select_according_to_probability(probabilities)
 		self.allowed.remove(self.curr)

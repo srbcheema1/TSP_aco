@@ -14,6 +14,7 @@ class DynamicPlot():
 			y.append(city.y)
 		self.ax.plot(x, y, 'co')
 
+		path.append(path[0])
 		for index in range(1, len(path)):
 			i = path[index-1]
 			j = path[index]
