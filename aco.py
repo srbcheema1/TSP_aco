@@ -22,9 +22,9 @@ class Graph(object):
 		return cost_matrix
 
 class ACO(object):
-	def __init__(self, ant_count: int, generations: int, alpha: float, beta: float, rho: float, q: int):
-		self.Q = q #pheromone intensity
-		self.rho = rho #pheromone residual coefficient
+	def __init__(self, ant_count: int, generations: int, alpha: float, beta: float, decay: float, quantity: int):
+		self.quantity = quantity #pheromone intensity
+		self.decay = decay #evaporation or decay of phermone
 		self.beta = beta #relative importance of heuristic information
 		self.alpha = alpha #relative importance of pheromone
 		self.ant_count = ant_count
@@ -34,23 +34,23 @@ class ACO(object):
 	def _update_pheromone(self, graph: Graph, ants: list):
 		for i, row in enumerate(graph.pheromone):
 			for j, col in enumerate(row):
-				graph.pheromone[i][j] *= self.rho
+				graph.pheromone[i][j] *= self.decay
 				for ant in ants:
 					graph.pheromone[i][j] += ant.pheromone_delta[i][j]
 
 
 	def solve(self, graph: Graph):
+		history = []
 		best_cost = float('inf')
-		best_solution = []
 		for gen in range(self.generations):
 			ants = [_Ant(self, graph) for i in range(self.ant_count)]
 			for ant in ants:
 				cost = ant.travel()
 				if cost < best_cost:
 					best_cost = cost
-					best_solution = [] + ant.path
+					history.append([] + ant.path)
 			self._update_pheromone(graph, ants)
-		return best_solution, best_cost
+		return history, best_cost
 
 
 
@@ -113,4 +113,4 @@ class _Ant(object):
 		for _ in range(1, len(self.path)):
 			i = self.path[_ - 1]
 			j = self.path[_]
-			self.pheromone_delta[i][j] = self.aco.Q
+			self.pheromone_delta[i][j] = self.aco.quantity

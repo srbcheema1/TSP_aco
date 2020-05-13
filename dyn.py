@@ -4,21 +4,21 @@ class DynamicPlot():
 	def __init__(self):
 		plt.ion() # plot interactive mode ON
 		self.figure, self.ax = plt.subplots()
-		self.ax.plot([],[], 'o') # emtpy plot
+		self.cyan_line, = self.ax.plot([],[], 'co-') # emtpy plot
+		self.red_line, = self.ax.plot([],[], 'ro') # emtpy plot
 
 	def plot(self, cities, path: list):
 		x = []
 		y = []
-		for city in cities:
-			x.append(city.x)
-			y.append(city.y)
-		self.ax.plot(x, y, 'co')
 
 		path.append(path[0])
-		for index in range(1, len(path)):
-			i = path[index-1]
-			j = path[index]
-			self.ax.arrow(x[i], y[i], x[j] - x[i], y[j] - y[i], color='r', length_includes_head=True)
+		for index in range(0, len(path)):
+			city = cities[path[index]]
+			x.append(city.x)
+			y.append(city.y)
+		
+		self.cyan_line.set_data(x, y)
+		self.red_line.set_data([cities[0].x],[cities[0].y])
 
 		self.ax.set_xlim(0, (max(x)+2) * 1.1)
 		self.ax.set_ylim(0, (max(y)+2)* 1.1)
