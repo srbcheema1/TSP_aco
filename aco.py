@@ -51,7 +51,9 @@ class _Ant(object):
 
 		self.pheromone_delta = []  # the local increase of pheromone
 		self.allowed = {i for i in range(graph.size)}  # nodes which are allowed for the next selection
-		self.ease = [[0 if i == j else 1 / graph.cost[i][j] for j in range(graph.size)] for i in range(graph.size)]  # heuristic information
+		self.ease = [[0 if i == j else 10 / graph.cost[i][j] for j in range(graph.size)] for i in range(graph.size)]  # heuristic information
+		self.capacity = 0
+		self.max_capacity = 10
 
 		self.path = []  # path list
 		self.curr = 0
@@ -60,34 +62,34 @@ class _Ant(object):
 
 
 	def travel(self):
-		for i in range(self.graph.size - 1):
+		while self.allowed:
 			self._select_next()
 		self._update_pheromone_delta()
-		return self._travel_cost()
+		return self.graph.path_cost(self.path)
 
 
-	def _travel_cost(self):
-		cost = 0
-		for index in range(1, len(self.path)):
-			i = self.path[index-1]
-			j = self.path[index]
-			cost += self.graph.cost[i][j]
-		cost += self.graph.cost[self.path[0]][self.path[-1]] #round trip
-		return cost
-
+	def _unload(self):
+		self.path.append(0)
+		self.capacity = 0
+		self.curr = 0
 
 	def _select_next(self):
+		if(self.capacity > self.max_capacity):
+			self._unload()
+
 		denominator = 0
 		for i in self.allowed:
-			denominator += self.graph.pheromone[self.curr][i]**self.aco.alpha * self.ease[self.curr][i]**self.aco.beta
+			denominator += (1+self.graph.pheromone[self.curr][i])**self.aco.alpha * self.ease[self.curr][i]**self.aco.beta
+
 
 		probabilities = [0 for i in range(self.graph.size)]  # probabilities for moving to a node in the next step
 		for i in self.allowed:
-			probabilities[i] = self.graph.pheromone[self.curr][i]**self.aco.alpha * self.ease[self.curr][i]**self.aco.beta / denominator
+			probabilities[i] = (1+self.graph.pheromone[self.curr][i])**self.aco.alpha * self.ease[self.curr][i]**self.aco.beta / denominator
 
 		self.curr = self._select_according_to_probability(probabilities)
 		self.allowed.remove(self.curr)
 		self.path.append(self.curr)
+		self.capacity = self.capacity + 1
 
 
 	def _select_according_to_probability(self,probabilities):
