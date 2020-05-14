@@ -22,14 +22,22 @@ class Graph(object):
 		return cost_matrix
 
 class ACO(object):
-	def __init__(self, ant_count: int, generations: int, alpha: float, beta: float, decay: float, quantity: int):
+	def __init__(self, ant_count: int, generations: int, quantity: int, alpha: list, beta: list, decay: list):
 		self.quantity = quantity #pheromone intensity
-		self.decay = decay #evaporation or decay of phermone
-		self.beta = beta #relative importance of heuristic information
-		self.alpha = alpha #relative importance of pheromone
 		self.ant_count = ant_count
 		self.generations = generations
+		#these will vary with generations
+		self.decay = decay[0] #evaporation or decay of phermone
+		self.beta = beta[0] #relative importance of heuristic information
+		self.alpha = alpha[0] #relative importance of pheromone
+		self.decay_p = decay
+		self.alpha_p = alpha
+		self.beta_p = beta
 
+	def _update_parameters(self,gen):
+		self.decay = self.decay_p[0] + (self.decay_p[1]-self.decay_p[0])*gen/self.generations
+		self.alpha = self.alpha_p[0] + (self.alpha_p[1]-self.alpha_p[0])*gen/self.generations
+		self.beta = self.beta_p[0] + (self.beta_p[1]-self.beta_p[0])*gen/self.generations
 
 	def _update_pheromone(self, graph: Graph, ants: list):
 		for i, row in enumerate(graph.pheromone):
@@ -43,6 +51,7 @@ class ACO(object):
 		history = []
 		best_cost = float('inf')
 		for gen in range(self.generations):
+			self._update_parameters(gen)
 			ants = [_Ant(self, graph) for i in range(self.ant_count)]
 			for ant in ants:
 				cost = ant.travel()

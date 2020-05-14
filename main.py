@@ -7,7 +7,7 @@ from city import City
 def run_file(file_name,plt):
 	cities = City.load_cities(file_name)
 	graph = Graph(cities)
-	history,cost = ACO(20, 100, 2.0, 3.0, 0.7, 10).solve(graph)
+	history,cost = ACO(20, 100, 10, [1.0,3.0], [4.0,2.0], [0.4,0.8]).solve(graph)
 
 	print(cost,history[-1])
 	for path in history:
