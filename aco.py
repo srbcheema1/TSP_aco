@@ -1,25 +1,6 @@
 import random
-import math
 
-class Graph(object):
-	def __init__(self, cities: list):
-		self.cities = cities
-		self.cost = Graph.cost_matrix(cities)
-		self.size = len(self.cities)
-		self.pheromone = [[1 for j in range(self.size)] for i in range(self.size)]
-
-	def distance(a, b):
-		return math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2)
-
-	def cost_matrix(cities):
-		cost_matrix = []
-		rank = len(cities)
-		for i in range(rank):
-			row = []
-			for j in range(rank):
-				row.append(Graph.distance(cities[i], cities[j]))
-			cost_matrix.append(row)
-		return cost_matrix
+from graph import Graph
 
 class ACO(object):
 	def __init__(self, ant_count: int, generations: int, quantity: int, alpha: list, beta: list, decay: list):
