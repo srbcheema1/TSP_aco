@@ -10,6 +10,7 @@ class City:
 	def __str__(self):
 		return "{" + str(self.index) + ": " + str(self.x) + "," + str(self.y) + "}"
 	
+	@staticmethod
 	def load_cities(file_name):
 		cities = []
 		with open(file_name) as f:

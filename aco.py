@@ -52,8 +52,6 @@ class _Ant(object):
 		self.pheromone_delta = []  # the local increase of pheromone
 		self.allowed = {i for i in range(graph.size)}  # nodes which are allowed for the next selection
 		self.ease = [[0 if i == j else 10 / graph.cost[i][j] for j in range(graph.size)] for i in range(graph.size)]  # heuristic information
-		self.capacity = 0
-		self.max_capacity = 10
 
 		self.path = []  # path list
 		self.curr = 0
@@ -68,15 +66,7 @@ class _Ant(object):
 		return self.graph.path_cost(self.path)
 
 
-	def _unload(self):
-		self.path.append(0)
-		self.capacity = 0
-		self.curr = 0
-
 	def _select_next(self):
-		if(self.capacity > self.max_capacity):
-			self._unload()
-
 		denominator = 0
 		for i in self.allowed:
 			denominator += (1+self.graph.pheromone[self.curr][i])**self.aco.alpha * self.ease[self.curr][i]**self.aco.beta
@@ -89,7 +79,6 @@ class _Ant(object):
 		self.curr = self._select_according_to_probability(probabilities)
 		self.allowed.remove(self.curr)
 		self.path.append(self.curr)
-		self.capacity = self.capacity + 1
 
 
 	def _select_according_to_probability(self,probabilities):
