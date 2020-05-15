@@ -8,10 +8,12 @@ class Graph(object):
 		self.pheromone = [[1 for j in range(self.size)] for i in range(self.size)]
 
 
+	@staticmethod
 	def distance(a, b):
 		return math.sqrt((a.x - b.x)**2 + (a.y - b.y)**2)
 
 
+	@staticmethod
 	def cost_matrix(cities):
 		cost_matrix = []
 		rank = len(cities)

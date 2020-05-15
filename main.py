@@ -2,6 +2,7 @@ from aco import ACO, Graph
 from dynamic_plot import DynamicPlot
 from city import City
 
+
 def run_file(file_name,plt):
 	cities = City.load_cities(file_name)
 	graph = Graph(cities)
@@ -13,4 +14,3 @@ def run_file(file_name,plt):
 if __name__ == '__main__':
 	plt = DynamicPlot()
 	run_file('./data/data30.txt',plt)
-	
