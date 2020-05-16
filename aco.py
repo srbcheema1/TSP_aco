@@ -24,7 +24,9 @@ class ACO(object):
 		for i, row in enumerate(graph.pheromone):
 			for j, col in enumerate(row):
 				graph.pheromone[i][j] *= self.decay
-				for ant in ants:
+				ants.sort()
+				best_ants = ants[:len(ants)//3]
+				for ant in best_ants:
 					graph.pheromone[i][j] += ant.pheromone_delta[i][j]
 
 
@@ -51,9 +53,11 @@ class _Ant(object):
 
 		self.pheromone_delta = []  # the local increase of pheromone
 		self.allowed = {i for i in range(graph.size)}  # nodes which are allowed for the next selection
-		self.ease = [[0 if i == j else 10 / graph.cost[i][j] for j in range(graph.size)] for i in range(graph.size)]  # heuristic information
+		self.ease = [[0 if i == j else 1+(10 / graph.cost[i][j]) for j in range(graph.size)] for i in range(graph.size)]  # heuristic information
 
 		self.path = []  # path list
+		self.cost = 0
+
 		self.curr = 0
 		self.path.append(self.curr)
 		self.allowed.remove(self.curr)
@@ -63,7 +67,8 @@ class _Ant(object):
 		while self.allowed:
 			self._select_next()
 		self._update_pheromone_delta()
-		return self.graph.path_cost(self.path)
+		self.cost = self.graph.path_cost(self.path)
+		return self.cost
 
 
 	def _select_next(self):
@@ -95,3 +100,7 @@ class _Ant(object):
 			i = self.path[_ - 1]
 			j = self.path[_]
 			self.pheromone_delta[i][j] = self.aco.quantity
+
+
+	def __lt__(self,other):
+		self.cost < other.cost
