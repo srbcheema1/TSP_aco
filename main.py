@@ -3,14 +3,13 @@ from dynamic_plot import DynamicPlot
 from city import City
 
 
-def run_file(file_name,plt):
-	cities = City.load_cities(file_name)
+def main():
+	cities = City.load_cities('./data/data30.txt')
 	graph = Graph(cities)
 	history,cost = ACO(20, 200, 10, [1.0,3.0], [4.0,2.0], [0.4,0.8]).solve(graph)
-	print(cost,history[-1])
-	plt.show(cities,history)
+	print(cost)
+	DynamicPlot().show(cities,history)
 
 
 if __name__ == '__main__':
-	plt = DynamicPlot()
-	run_file('./data/data30.txt',plt)
+	main()

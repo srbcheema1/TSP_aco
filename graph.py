@@ -40,6 +40,37 @@ class Graph(object):
 		return result
 
 
+	def minimumSpanningTree(self):
+		parent = [-1 for i in range(self.size)]
+		included = [False for i in range(self.size)]
+		dist_from_tree = [10**9 for i in range(self.size)]
+		dist_from_tree[0] = 0
+
+		def _nearest_city():
+			min_dist = 10**9
+			min_index = -1
+			for i in range(len(dist_from_tree)):
+				if(included[i] == False and dist_from_tree[i] < min_dist):
+					min_dist = dist_from_tree[i]
+					min_index = i
+			return min_index
+
+		for _ in range(self.size):
+			u = _nearest_city()
+			included[u] = True
+			for v in range(self.size):
+				if(included[v] == False and dist_from_tree[v] > self.cost[u][v]):
+					dist_from_tree[v] = self.cost[u][v]
+					parent[v] = u
+		
+		cost = 0
+		lines = []
+		for _ in range(1,self.size):
+			cost += self.cost[_][parent[_]]
+			lines.append([(self.cities[_].x,self.cities[_].y), (self.cities[parent[_]].x,self.cities[parent[_]].y)])
+		return cost,lines,parent
+
+
 	def path_cost(self,path):
 		cost = 0
 		for index in range(1, len(path)):
