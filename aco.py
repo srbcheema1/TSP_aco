@@ -15,10 +15,12 @@ class ACO(object):
 		self.alpha_p = alpha
 		self.beta_p = beta
 
+
 	def _update_parameters(self,gen):
 		self.decay = self.decay_p[0] + (self.decay_p[1]-self.decay_p[0])*gen/self.generations
 		self.alpha = self.alpha_p[0] + (self.alpha_p[1]-self.alpha_p[0])*gen/self.generations
 		self.beta = self.beta_p[0] + (self.beta_p[1]-self.beta_p[0])*gen/self.generations
+
 
 	def _update_pheromone(self, graph: Graph, ants: list):
 		for i, row in enumerate(graph.pheromone):
@@ -53,10 +55,10 @@ class _Ant(object):
 
 		self.pheromone_delta = []  # the local increase of pheromone
 		self.allowed = {i for i in range(graph.size)}  # nodes which are allowed for the next selection
-		self.ease = [[0 if i == j else 1+(10 / graph.cost[i][j]) for j in range(graph.size)] for i in range(graph.size)]  # heuristic information
+		self.ease = [[0 if i == j else 1 + (10 / graph.cost[i][j]) for j in range(graph.size)] for i in range(graph.size)]  # heuristic information
 
 		self.path = []  # path list
-		self.cost = 0
+		self.cost = 0 # path cost by ant
 
 		self.curr = 0
 		self.path.append(self.curr)
@@ -75,7 +77,6 @@ class _Ant(object):
 		denominator = 0
 		for i in self.allowed:
 			denominator += (1+self.graph.pheromone[self.curr][i])**self.aco.alpha * self.ease[self.curr][i]**self.aco.beta
-
 
 		probabilities = [0 for i in range(self.graph.size)]  # probabilities for moving to a node in the next step
 		for i in self.allowed:
@@ -102,5 +103,5 @@ class _Ant(object):
 			self.pheromone_delta[i][j] = self.aco.quantity
 
 
-	def __lt__(self,other):
-		self.cost < other.cost
+	def __lt__(self, other):
+		return self.cost < other.cost
